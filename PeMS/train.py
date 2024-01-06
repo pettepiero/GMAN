@@ -34,6 +34,8 @@ parser.add_argument(
 parser.add_argument("--decay_epoch", type=int, default=5, help="decay epoch")
 parser.add_argument("--traffic_file", default="data/pems-bay.h5", help="traffic file")
 # parser.add_argument("--traffic_file", default="data/PeMS.h5", help="traffic file")
+parser.add_argument("--keep_perc", type=float, default=0.5, help="How much of the data to keep")
+
 parser.add_argument(
     "--SE_file", default="data/SE(PeMS).txt", help="spatial emebdding file"
 )
@@ -68,6 +70,34 @@ utils.log_string(log, "trainX: %s\ttrainY: %s" % (trainX.shape, trainY.shape))
 utils.log_string(log, "valX:   %s\t\tvalY:   %s" % (valX.shape, valY.shape))
 utils.log_string(log, "testX:  %s\t\ttestY:  %s" % (testX.shape, testY.shape))
 utils.log_string(log, "data loaded!")
+
+# Keeping only a fraction of the data, based on the keep_perc argument
+keep_perc = args.keep_perc  # assuming keep_perc is a float between 0 and 1
+
+# Calculate the number of samples to keep
+num_samples_train = int(len(trainX) * keep_perc)
+num_samples_val = int(len(valX) * keep_perc)
+num_samples_test = int(len(testX) * keep_perc)
+
+# Keep only the first num_samples of each dataset
+trainX, trainY = trainX[:num_samples_train], trainY[:num_samples_train]
+valX, valY = valX[:num_samples_val], valY[:num_samples_val]
+testX, testY = testX[:num_samples_test], testY[:num_samples_test]
+
+utils.log_string(log, "trainX: %s\ttrainY: %s" % (trainX.shape, trainY.shape))
+utils.log_string(log, "valX:   %s\t\tvalY:   %s" % (valX.shape, valY.shape))
+utils.log_string(log, "testX:  %s\t\ttestY:  %s" % (testX.shape, testY.shape))
+
+
+print(f"Data looks like this: trainX[0]={trainX[0]}")
+print(f"trainX[0].shape={trainX[0].shape}")
+print(f"trainY[0]={trainY[0]}")
+print(f"trainTE[0]={trainTE[0]}")
+print(f"valX[0]={valX[0]}")
+print(f"valY[0]={valY[0]}")
+print(f"testX[0]={testX[0]}")
+print(f"testY[0]={testY[0]}")
+print(f"testTE[0]={testTE[0]}")
 
 # train model
 utils.log_string(log, "compiling model...")
